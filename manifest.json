@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "SlopSniffer",
+  "version": "1.0.0",
+  "description": "Blocks AI-generated content slop on LinkedIn posts.",
+  "icons": {
+    "128": "logo.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["config.js", "slopSniffer.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [],
+  "web_accessible_resources": [
+    {
+      "resources": ["logo.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

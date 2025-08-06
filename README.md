@@ -1,61 +1,124 @@
 # SlopSniffer
 
-**SlopSniffer** is a Python-based text processing tool that identifies and flags suspect or confusing sentence structures — particularly those involving em-dashes and clause-level negation. It’s intended as a backend component for browser-based tools that help users clean up or analyze written content.
-
-This is an early prototype implementation. It currently uses a single heuristic, but future releases may include up to seven more.
+**SlopSniffer** is a Google Chrome extension that automatically detects and blocks AI-generated content ("slop") on LinkedIn posts. It identifies posts with telltale AI writing patterns and covers them with a friendly warning overlay, giving users control over what content they consume.
 
 ## Status
 
-**Pre-release**  
-This is version `0.0.0`. It's a foundational prototype and not yet intended for production use or broad distribution. A more complete public release is planned as part of a Chrome extension.
+**Beta Release**  
+This is version `1.0` - a working Chrome extension ready for testing. The detection algorithm uses one primary heuristic, with plans to add up to seven more detection patterns in future releases. Because the extension is still in developed, it is not a packed extension available through the Google chrome Web Store. It must be downloaded and then loaded as an unpacked extension (steps on doing this are included below).
 
 ## Features
 
-Detects posts with at least one sentence likely to have been AI-generated, defined as a sentence containing at least one dash-like character, the pre-dash clause of which contained a negation.
+- **Regex-Based Detection**: Quickly identifies posts containing classic signs of AI authorship (e.g., a contrast-framed sentence containing an em-dash: "it's not just stunning—it's brave")
+- **Clean Interface**: Covers suspected AI posts with a gold-bordered overlay
+- **User Control**: "Show me the slop, anyway!" button to reveal content when desired
+- **Feedback System**: Optional feedback buttons to help improve detection accuracy when
+- **Performance Optimized**: Debounced processing that won't slow down LinkedIn
 
 ## Installation
 
-Clone the repo:
+### Prerequisites (Optional - for Git beginners)
 
-```bash
-git clone https://github.com/yourusername/slop-sniffer.git
-cd slop-sniffer
-```
+If you don't have Git installed, you have two options:
 
-Install dependencies (if any):
+**Option 1: Download ZIP (Easiest)**
+1. Click the green "Code" button on this GitHub page
+2. Select "Download ZIP"
+3. Extract the ZIP file to a folder on your computer
+4. Skip to step 2 below
 
-```bash
-pip install -r requirements.txt
-```
+**Option 2: Install Git**
+- **Windows**: Download from [git-scm.com](https://git-scm.com/download/win)
+- **Mac**: Install via [Homebrew](https://brew.sh/) with `brew install git`, or download from [git-scm.com](https://git-scm.com/download/mac)
+- **Linux**: Use your package manager (e.g., `sudo apt install git` on Ubuntu)
+
+### For Users
+
+1. Get the code:
+   
+   **If you installed Git:**
+   ```bash
+   git clone https://github.com/swisnieski85/slop-sniffer.git
+   ```
+   
+   **If you downloaded the ZIP:**
+   Extract it to a folder like `slop-sniffer`
+
+2. Open Chrome and navigate to `chrome://extensions/`
+
+3. Enable "Developer mode" (toggle in top-right corner)
+
+4. Click "Load unpacked" and select the `slop-sniffer` folder (don't double-click the folder; simply select it with a single-click and then click Select Folder)
+
+5. The extension should now appear in your extensions list and work on LinkedIn.
+
+### For Development
+
+1. Follow the user installation steps above
+2. Make changes to the code
+3. Click the "Reload" button next to SlopSniffer in `chrome://extensions/`
+4. Refresh any LinkedIn tabs to see your changes
 
 ## Usage
 
-Example:
+1. **Browse LinkedIn normally** - SlopSniffer runs automatically in the background
+2. **AI posts get flagged** - Suspected AI-generated posts will be covered with a gold-bordered overlay
+3. **Choose to view or skip** - Click "Show me the slop, anyway!" to reveal the content
+4. **Provide feedback** (optional) - Help improve detection by marking posts as correctly/incorrectly identified
 
-```python
-from slop_sniffer import SlopSniffer
+## Feedback System
 
-slop_sniffer = SlopSniffer()
-good_text = "Hello, my name is Sean. What's your name?"
-bad_text = "It's not just stunning - it's brave."
+The extension includes an optional feedback system to help improve detection accuracy. Feedback is stored in a Firebase database, the project ID of which is stored in a config.js file not included in this Git repo.
 
-slop_sniffer.sniff(good_text) # False - not AI-generated
-slop_sniffer.sniff(bad_text)  # True - probably AI-generated
-```
+- **Without `config.js`**: Detection and blocking works perfectly, but feedback buttons won't submit data
+- **With `config.js`**: You can provide feedback on whether posts were correctly identified as AI slop
 
-The `sniff` method returns `True` if it finds a sentence with an em-dash preceded by contrast-framing.
+### Beta Testing
 
-## Development
+If you'd like to help improve SlopSniffer by providing feedback on detection accuracy:
 
-This project is written in pure Python and is designed to be modular. Future iterations may include:
+1. **Contact me** for a `config.js` file with the Firebase project ID
+2. Place the `config.js` file in your extension folder alongside the other files
+3. Reload the extension in Chrome
+4. Use the feedback buttons (✅ Good catch! / ❌ False positive) that appear after revealing posts
 
-- More sophisticated parsing
-- Additional heuristics for sloppiness
-- Integration with JavaScript/TypeScript for browser extensions
+Your feedback helps train the algorithm and reduces false positives for everyone!
+
+**Want to be a beta tester?** Open an issue on this repo or contact me via my GitHub profile, and I'll send you the config.js file.
+
+## How Detection Works
+
+Currently uses one heuristic that catches a common AI writing pattern:
+
+**Pattern**: Posts containing dash-like characters where the pre-dash clause contains negation words (evidence of contrast framing)
+
+**Examples that get flagged**:
+- "It's not just innovative — it's revolutionary"
+- "This isn't your average solution - it's transformative" 
+- "We don't just deliver results — we exceed expectations"
+
+**Why this works**: AI models often use this contrast-framing structure, while humans tend to write more naturally.
+
+## Future Plans
+
+- **More Detection Patterns**: 8 additional heuristics planned for implementation
+- **Improved Accuracy**: Refinement of heuristics based on feedback
+- **Better Analytics**: Detection statistics and trends
+- **Other Browser Implementations**: Maybe, eventually, expanding the extension to work for other browsers
 
 ## Contributing
 
-Pull requests and feedback are welcome, but please note that the project is still in early development and interfaces may change frequently.
+Pull requests welcome! This project is actively maintained and interfaces may evolve as I add more detection methods.
+
+**Current priorities**:
+- Additional AI detection patterns
+- False positive reduction  
+- Performance improvements
+- User experience enhancements
+
+## Privacy
+
+SlopSniffer processes post content locally in your browser. No post content is transmitted externally unless you explicitly submit feedback (even then, the only data stored is your feedback, the timestamp, and the LinkedIn post ID; no data is stored regarding the user).
 
 ## License
 
