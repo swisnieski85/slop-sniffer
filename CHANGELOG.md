@@ -4,6 +4,13 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2025-08-06
+### Added
+- Added dummy (empty) config.js file.
+
+### Changed
+- Updated README.md appropriately.
+
 ## [1.0.1] - 2025-08-06
 ### Added
 - Added user version number to Firebase feedback

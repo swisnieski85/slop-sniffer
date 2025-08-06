@@ -68,7 +68,7 @@ If you don't have Git installed, you have two options:
 
 ## Feedback System
 
-The extension includes an optional feedback system to help improve detection accuracy. Feedback is stored in a Firebase database, the project ID of which is stored in a config.js file not included in this Git repo.
+The extension includes an optional feedback system to help improve detection accuracy. Feedback is stored in a Firebase database, the project ID of which is stored in a config.js file not included in this Git repo (the version included in this repo is empty).
 
 - **Without `config.js`**: Detection and blocking works perfectly, but feedback buttons won't submit data
 - **With `config.js`**: You can provide feedback on whether posts were correctly identified as AI slop
@@ -79,7 +79,7 @@ If you'd like to help improve SlopSniffer by providing feedback on detection acc
 
 1. **Contact me** for a `config.js` file with the Firebase project ID
 2. Place the `config.js` file in your extension folder alongside the other files
-3. Reload the extension in Chrome
+3. Reload the extension in Chrome and refresh your LinkedIn feed
 4. Use the feedback buttons (✅ Good catch! / ❌ False positive) that appear after revealing posts
 
 Your feedback helps train the algorithm and reduces false positives for everyone!
