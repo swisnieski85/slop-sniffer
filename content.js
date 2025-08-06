@@ -191,7 +191,8 @@ function sendFeedback(postElement, isCorrect) {
   const feedback = {
     postId: postId,
     isCorrect: isCorrect,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: chrome.runtime.getManifest().version
   };
   
   // Send to Firebase Firestore using REST API
@@ -204,7 +205,8 @@ function sendFeedback(postElement, isCorrect) {
       fields: {
         postId: { stringValue: feedback.postId },
         isCorrect: { booleanValue: feedback.isCorrect },
-        timestamp: { stringValue: feedback.timestamp }
+        timestamp: { stringValue: feedback.timestamp },
+        version: { stringValue: feedback.version }
       }
     })
   }).then(response => {

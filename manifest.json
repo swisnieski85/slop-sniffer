@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "SlopSniffer",
-  "version": "1.0.0",
-  "description": "Blocks AI-generated content slop on LinkedIn posts.",
+  "version": "1.0.1",
+  "description": "Detects and blocks AI-generated content on LinkedIn posts.",
   "icons": {
     "128": "logo.png"
   },

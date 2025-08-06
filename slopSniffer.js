@@ -52,7 +52,7 @@ const SlopSniffer = (() => {
 
   function splitSentences(text) {
     // Basic sentence splitter
-    return text.trim().split(/(?<=[.:!?•|])\s+(?=[A-Z])/);
+    return text.trim().split(/(?<=[.:!?•])\s+(?=[A-Z])|(?<=\w)\n+(?=[A-Z])/);
   }
 
   function sniff(text) {
