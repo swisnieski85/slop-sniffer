@@ -56,6 +56,8 @@ const SlopSniffer = (() => {
   }
 
   function sniff(text) {
+    if (!dashRegex.test(text)) return false;
+    
     const sentences = splitSentences(text);
     const offenders = sentences.filter((sentence) => dashRegex.test(sentence))
       .map((sentence) => sentence.split(dashRegex)[0].trim());

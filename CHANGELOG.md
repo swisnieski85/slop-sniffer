@@ -4,6 +4,14 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] - 2025-08-7
+### Added
+- Added fast early-exit optimization to avoid unnecessary splitting and matching.
+
+### Changed
+- Masking box content now appears vertically top-aligned rather than centered.
+
+
 ## [1.0.2] - 2025-08-06
 ### Added
 - Added dummy (empty) config.js file.

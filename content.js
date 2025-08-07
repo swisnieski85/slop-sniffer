@@ -77,7 +77,7 @@ function overlayPost(postElement) {
     border: "3px solid gold",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     zIndex: 50, // Very low z-index to stay behind everything
   });
