@@ -4,8 +4,13 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.2] - 2025-08-08
+### Fixed
+- Added word boundaries around "not" in the regex negation list, so that longer strings containing "not" as a substring are not flagged (e.g., "another").
+
+
 ## [1.1.1] - 2025-08-08
-### Changed
+### Fixed
 - Added ellipsis characters (…) as sentence boundaries in slopSniffer.js' splitSentences method, to reduce false positives.
 - Removed config.js from .gitignore (it somehow made it into the Git repo, anyway).
 

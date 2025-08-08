@@ -25,7 +25,7 @@ const SlopSniffer = (() => {
   const apostrophe = "['']";
 
   const negations = [
-    'not',
+    '\\bnot\\b',
     `\\bcan${apostrophe}t\\b`,
     `\\bwon${apostrophe}t\\b`,
     //`\\bdon${apostrophe}t\\b`,
