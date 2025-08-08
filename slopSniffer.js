@@ -50,7 +50,7 @@ const SlopSniffer = (() => {
 
   function splitSentences(text) {
     // Basic sentence splitter
-    return text.trim().split(/(?<=[.:!?•])\s+(?=[A-Z])|(?<=\w)\n+(?=[A-Z])/);
+    return text.trim().split(/(?<=[.:!?•…])\s+(?=[A-Z])|(?<=\w)\n+(?=[A-Z])/);
   }
   
   // Heuristic 1: Contrast framing with negation + dash

@@ -67,23 +67,17 @@ If you don't have Git installed, you have two options:
 
 ## Feedback System
 
-The extension includes an optional feedback system to help improve detection accuracy. Feedback is stored in a Firebase database, the project ID of which is stored in a config.js file not included in this Git repo (the version included in this repo is empty).
-
-- **Without `config.js`**: Detection and blocking works perfectly, but feedback buttons won't submit data, and when you click them, nothing will appear to happen
-- **With `config.js`**: You can provide feedback on whether posts were correctly identified as AI slop. After clicking a feedback button, the border around the targeted post will change and the feedback buttons will disappear
+The extension includes an optional feedback system to help improve detection accuracy. Feedback is stored in a remote Firebase database, the project ID of which is stored in config.js.
 
 ### Beta Testing
 
 If you'd like to help improve SlopSniffer by providing feedback on detection accuracy:
 
-1. **Contact me** for a `config.js` file with the Firebase project ID
-2. Place the `config.js` file in your extension folder alongside the other files
-3. Reload the extension in Chrome and refresh your LinkedIn feed
-4. Use the feedback buttons (✅ Good catch! / ❌ False positive) that appear after revealing posts
+1. Ensure you have downloaded the latest version of SlopSniffer and loaded it into your Google Chrome extensions.
+2. When you see a masked post in your LinkedIn feed, click "Show me the slop, anyway!" and then scroll the bottom to see feedback buttons for the post.
+3. Click the appropriate button to submit feedback. If the post border changes and the buttons disappear, you know feedback has been submitted successfully.
 
 Your feedback helps train the algorithm and reduces false positives for everyone!
-
-**Want to be a beta tester?** Open an issue on this repo or contact me via my GitHub profile, and I'll send you the config.js file.
 
 ## How Detection Works
 
@@ -103,21 +97,21 @@ Currently uses one heuristic that catches a common AI writing pattern:
 - **More Detection Patterns**: 8 additional heuristics planned for implementation
 - **Improved Accuracy**: Refinement of heuristics based on feedback
 - **Better Analytics**: Detection statistics and trends
-- **Other Browser Implementations**: Maybe, eventually, expanding the extension to work for other browsers
+- **Other Browser Implementations**: Maybe, eventually, expanding the extension to work for other browsers or even devices
 
 ## Contributing
 
 Pull requests welcome! This project is actively maintained and interfaces may evolve as I add more detection methods.
 
 **Current priorities**:
-- Additional AI detection patterns
+- Additional AI content detection patterns
 - False positive reduction  
 - Performance improvements
 - User experience enhancements
 
 ## Privacy
 
-SlopSniffer processes post content locally in your browser. No post content is transmitted externally unless you explicitly submit feedback (even then, the only data stored is your feedback, the timestamp, and the LinkedIn post ID; no data is stored regarding the user).
+SlopSniffer processes post content locally in your browser. No post content is transmitted externally unless you explicitly submit feedback (even then, the only data stored is your feedback, the timestamp, the LinkedIn post ID, and the SlopSniffer version number; no other data is stored regarding the user).
 
 ## License
 

@@ -4,6 +4,12 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2025-08-08
+### Changed
+- Added ellipsis characters (…) as sentence boundaries in slopSniffer.js' splitSentences method, to reduce false positives.
+- Removed config.js from .gitignore (it somehow made it into the Git repo, anyway).
+
+
 ## [1.1.0] - 2025-08-08
 ### Added
 - Detection reason display in content mask showing which AI content pattern was identified.
@@ -14,7 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Heuristic checks now return reason text for displaying in the content mask overlay.
 
 
-## [1.0.3] - 2025-08-7
+## [1.0.3] - 2025-08-07
 ### Added
 - Added fast early-exit optimization to avoid unnecessary splitting and matching.
 
