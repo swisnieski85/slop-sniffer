@@ -4,6 +4,16 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2025-08-08
+### Added
+- Detection reason display in content mask showing which AI content pattern was identified.
+
+### Changed
+- Removed "don't" from list of negation words (to prevent flagging harmless constructions like, e.g., "don't delay - reserve your spot today!").
+- Refactored slopSniffer.js to accommodate the introduction of new heuristics; sniff method now implements heuristic checks, with each individual heuristic assigned its own method.
+- Heuristic checks now return reason text for displaying in the content mask overlay.
+
+
 ## [1.0.3] - 2025-08-7
 ### Added
 - Added fast early-exit optimization to avoid unnecessary splitting and matching.

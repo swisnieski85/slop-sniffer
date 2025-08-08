@@ -1,9 +1,7 @@
 // slopSniffer.js
 
 /**
- * Detects LinkedIn-style AI slop based on:
- *  - presence of a dash-like character (em-dash or dash bookended by spaces)
- *  - presence of negation in the clause before the dash
+ * Detects LinkedIn-style AI slop using multiple heuristics
  */
 
 const SlopSniffer = (() => {
@@ -24,13 +22,13 @@ const SlopSniffer = (() => {
   const dashRegex = new RegExp(`(\\s[${otherDashes.join('')}](?=\\s)|${emDash})`);
 
   // Apostrophe can be straight or curly
-  const apostrophe = "['’]";
+  const apostrophe = "['']";
 
   const negations = [
     'not',
     `\\bcan${apostrophe}t\\b`,
     `\\bwon${apostrophe}t\\b`,
-    `\\bdon${apostrophe}t\\b`,
+    //`\\bdon${apostrophe}t\\b`,
     `\\bdoesn${apostrophe}t\\b`,
     `\\bdidn${apostrophe}t\\b`,
     `\\bhasn${apostrophe}t\\b`,
@@ -54,20 +52,42 @@ const SlopSniffer = (() => {
     // Basic sentence splitter
     return text.trim().split(/(?<=[.:!?•])\s+(?=[A-Z])|(?<=\w)\n+(?=[A-Z])/);
   }
-
-  function sniff(text) {
-    if (!dashRegex.test(text)) return false;
+  
+  // Heuristic 1: Contrast framing with negation + dash
+  function sniffContrastFraming(text) {
+    if (!dashRegex.test(text)) return { detected: false };
     
     const sentences = splitSentences(text);
     const offenders = sentences.filter((sentence) => dashRegex.test(sentence))
       .map((sentence) => sentence.split(dashRegex)[0].trim());
 
-    return offenders.some((s) => negationRegex.test(s));
+    const isDetected = offenders.some((s) => negationRegex.test(s));
+    
+    return {
+      detected: isDetected,
+      reason: isDetected ? "Contrast Framing" : null,
+      heuristic: "contrast_framing"
+    };
   }
 
-  return { sniff };
-})();
+  // Main detection method - runs all heuristics
+  function sniff(text) {
+    const heuristics = [
+      sniffContrastFraming
+    ];
+    
+    for (const heuristic of heuristics) {
+      const result = heuristic(text);
+      if (result.detected) {
+        return result;
+      }
+    }
+    
+    return { detected: false };
+  }
 
-// Example usage:
-// const postText = document.querySelector('.post-content-selector').innerText;
-// if (SlopSniffer.sniff(postText)) { hideOrCollapsePost(); }
+  return { 
+    sniff,
+    sniffContrastFraming
+  };
+})();

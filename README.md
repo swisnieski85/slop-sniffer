@@ -5,12 +5,12 @@
 ## Status
 
 **Beta Release**  
-This is version `1.0` - a working Chrome extension ready for testing. The detection algorithm uses one primary heuristic, with plans to add up to seven more detection patterns in future releases. Because the extension is still in developed, it is not a packed extension available through the Google chrome Web Store. It must be downloaded and then loaded as an unpacked extension (steps on doing this are included below).
+This is version `1.1` - a working Chrome extension ready for testing. The detection algorithm uses one primary heuristic, with plans to add up to eight more detection patterns in future releases. Because the extension is still in development, it is not a packed extension available through the Google chrome Web Store. It must be downloaded and then loaded as an unpacked extension (steps on doing this are included below).
 
 ## Features
 
 - **Regex-Based Detection**: Quickly identifies posts containing classic signs of AI authorship (e.g., a contrast-framed sentence containing an em-dash: "it's not just stunning—it's brave")
-- **Clean Interface**: Covers suspected AI posts with a gold-bordered overlay
+- **Clean Interface**: Covers suspected AI posts with a gold-bordered overlay indicating the reason the content was identified as AI-generated
 - **User Control**: "Show me the slop, anyway!" button to reveal content when desired
 - **Feedback System**: Optional feedback buttons to help improve detection accuracy when
 - **Performance Optimized**: Debounced processing that won't slow down LinkedIn
@@ -52,12 +52,11 @@ If you don't have Git installed, you have two options:
 
 5. The extension should now appear in your extensions list and work on LinkedIn.
 
-### For Development
+### To update to the latest version
 
-1. Follow the user installation steps above
-2. Make changes to the code
-3. Click the "Reload" button next to SlopSniffer in `chrome://extensions/`
-4. Refresh any LinkedIn tabs to see your changes
+1. Follow the same steps above to re-clone or download the Git repo. If you are an approved beta-tester with a non-empty config.js file, make sure to copy this file elsewhere before re-cloning or downloading, and paste it back into the target directory after, to ensure it isn't overwritten.
+2. In chrome://extensions, click the refresh button (a circular arrow) in the appropriate extension window.
+3. Refresh your LinkedIn feed.
 
 ## Usage
 
@@ -70,8 +69,8 @@ If you don't have Git installed, you have two options:
 
 The extension includes an optional feedback system to help improve detection accuracy. Feedback is stored in a Firebase database, the project ID of which is stored in a config.js file not included in this Git repo (the version included in this repo is empty).
 
-- **Without `config.js`**: Detection and blocking works perfectly, but feedback buttons won't submit data
-- **With `config.js`**: You can provide feedback on whether posts were correctly identified as AI slop
+- **Without `config.js`**: Detection and blocking works perfectly, but feedback buttons won't submit data, and when you click them, nothing will appear to happen
+- **With `config.js`**: You can provide feedback on whether posts were correctly identified as AI slop. After clicking a feedback button, the border around the targeted post will change and the feedback buttons will disappear
 
 ### Beta Testing
 

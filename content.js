@@ -19,7 +19,7 @@ function findLinkedInPosts() {
   return document.querySelectorAll("div.feed-shared-update-v2");
 }
 
-function overlayPost(postElement) {
+function overlayPost(postElement, reason) {
   const overlay = document.createElement("div");
   overlay.className = "slop-sniffer-overlay";
 
@@ -31,8 +31,15 @@ function overlayPost(postElement) {
 
   const text = document.createElement("p");
   text.innerText = "Woof! AI-Generated Content Detected!";
-  text.style.marginBottom = "12px";
   text.style.fontWeight = "bold";
+  
+  const reasonText = document.createElement("p");
+  reasonText.innerText = `AI Content Pattern Detected: ${reason}`;
+  reasonText.style.fontSize = "13px";
+  reasonText.style.color = "#DAA520";
+  reasonText.style.marginBottom = "12px";
+  reasonText.style.fontWeight = "500";
+  reasonText.style.fontStyle = "italic";
 
   const version = document.createElement("p");
   const fullVersion = chrome.runtime.getManifest().version;
@@ -63,6 +70,7 @@ function overlayPost(postElement) {
 
   overlay.appendChild(img);
   overlay.appendChild(text);
+  overlay.appendChild(reasonText);
   overlay.appendChild(version);
   overlay.appendChild(button);
 
@@ -79,7 +87,8 @@ function overlayPost(postElement) {
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
-    zIndex: 50, // Very low z-index to stay behind everything
+    paddingTop: "20px",
+    zIndex: 50,
   });
 
   // Position the overlay over the entire post
@@ -233,8 +242,9 @@ function processPosts() {
     post.setAttribute('data-slop-processed', 'true');
     
     const text = post.innerText;
-    if (text && SlopSniffer.sniff(text)) {
-      overlayPost(post);
+    const result = SlopSniffer.sniff(text);
+    if (result.detected) {
+      overlayPost(post, result.reason);
     }
   });
 }
