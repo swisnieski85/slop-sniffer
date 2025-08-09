@@ -22,10 +22,11 @@ const SlopSniffer = (() => {
   const dashRegex = new RegExp(`(\\s[${otherDashes.join('')}](?=\\s)|${emDash})`);
 
   // Apostrophe can be straight or curly
-  const apostrophe = "['']";
+  const apostrophe = "['\u2019]";
 
   const negations = [
-    '\\bnot\\b',
+    `\\bit${apostrophe}s not\\b`,
+    `\\cannot\\b`,
     `\\bcan${apostrophe}t\\b`,
     `\\bwon${apostrophe}t\\b`,
     //`\\bdon${apostrophe}t\\b`,
@@ -50,7 +51,7 @@ const SlopSniffer = (() => {
 
   function splitSentences(text) {
     // Basic sentence splitter
-    return text.trim().split(/(?<=[.:!?•…])\s+(?=[A-Z])|(?<=\w)\n+(?=[A-Z])/);
+    return text.trim().split(/(?<=[.:!?•…])\s+(?=[A-Z])|\n+/);
   }
   
   // Heuristic 1: Contrast framing with negation + dash
