@@ -194,7 +194,7 @@ function sendFeedback(postElement, isCorrect) {
     const postText = postElement.innerText.trim();
     const firstLine = postText.split('\n')[0].substring(0, 50);
     const timestamp = Date.now();
-    postId = `fallback_${firstLine.replace(/[^a-zA-Z0-9]/g, '_')}_${timestamp}`;
+    postId = `urn-unknown`;
   }
 
   const feedback = {

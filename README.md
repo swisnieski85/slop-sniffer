@@ -2,6 +2,8 @@
 
 **SlopSniffer** is a Google Chrome extension that automatically detects and blocks AI-generated content ("slop") on LinkedIn posts. It identifies posts with telltale AI writing patterns and covers them with a friendly warning overlay, giving users control over what content they consume.
 
+⚠️ SlopSniffer is constantly improving! **Check back often** for updates. ⚠️
+
 ## Status
 
 **Beta Release**  

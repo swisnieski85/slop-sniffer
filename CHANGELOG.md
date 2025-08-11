@@ -4,6 +4,12 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.4] - 2025-08-11
+### Fixed
+- Revised manifest.json to expose logo.png only to https://www.linkedin.com/, instead of all URLs.
+- Changed fallback URN identification to simply "urn-unknown" to eliminate possible privacy leaks.
+
+
 ## [1.1.3] - 2025-08-08
 ### Fixed
 - Revised regex pattern to treat all linebreaks as sentence boundaries, even if not preceded or followed by an alpha character (but instead by, e.g., an emoji or punctuation); this should avoid certain false positives
