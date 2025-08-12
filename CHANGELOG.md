@@ -4,6 +4,18 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2025-08-13
+### Added
+- Three new detection heuristics added: Contrast Framing (Sequential), Negative Tricolon, and Interrogative Hook
+  - Contrast Framing (Sequential): Two successive sentences beginning with negations and followed by an affirmation (e.g., "Not X. Not Y. Just Z.")
+  - Negative Tricolon: Three successive sentences beginning with a negation (e.g., "No X. No Y. No Z.")
+  - Interrogtive Hook: A short (2-3 word) question immediately answered (e.g., "Her jaw? Dropped like she just saw Beyonce at the local gym.")
+- Content mask revised to display the rule identifying a post above the feedback buttons
+
+### Changed
+- Original detection heuristic ("Contrast Framing") renamed "Contrast Framing (Inline)".
+
+
 ## [1.1.4] - 2025-08-11
 ### Fixed
 - Revised manifest.json to expose logo.png only to https://www.linkedin.com/, instead of all URLs.

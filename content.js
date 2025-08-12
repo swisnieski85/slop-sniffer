@@ -64,7 +64,7 @@ function overlayPost(postElement, reason) {
     setTimeout(() => {
       overlay.remove();
       // Add persistent gold border and feedback buttons
-      addFeedbackUI(postElement);
+      addFeedbackUI(postElement, reason);
     }, 300);
   });
 
@@ -97,7 +97,7 @@ function overlayPost(postElement, reason) {
   postElement.appendChild(overlay);
 }
 
-function addFeedbackUI(postElement) {
+function addFeedbackUI(postElement, reason) {
   // Add gold border to the post with !important to override LinkedIn's styles
   postElement.style.setProperty('border', '3px solid gold', 'important');
   postElement.style.setProperty('border-radius', '8px', 'important');
@@ -108,7 +108,8 @@ function addFeedbackUI(postElement) {
   feedbackContainer.className = "slop-feedback-container";
   feedbackContainer.style.cssText = `
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     gap: 10px;
     padding: 8px;
     background: #fff9e6;
@@ -117,7 +118,29 @@ function addFeedbackUI(postElement) {
     border: 1px solid #ffd700;
   `;
   
-  // "Correct" button
+  if (reason) {
+    const reasonDisplay = document.createElement("p");
+    reasonDisplay.innerText = `AI Content Pattern Detected: ${reason}`;
+    reasonDisplay.style.cssText = `
+      font-size: 13px;
+      justify-content: center;
+      font-style: italic;
+      color: #b8860b; /* goldenrod */
+      margin: 0 0 6px 0;
+      font-weight: 500;
+    `;
+    feedbackContainer.appendChild(reasonDisplay);
+  }
+  
+  // Buttons container for horizontal layout
+  const buttonsRow = document.createElement("div");
+  buttonsRow.style.cssText = `
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+  `;
+
   const correctBtn = document.createElement("button");
   correctBtn.innerText = "✅ Good catch!";
   correctBtn.style.cssText = `
@@ -128,9 +151,9 @@ function addFeedbackUI(postElement) {
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
+    flex: 1;
   `;
-  
-  // "Incorrect" button  
+
   const incorrectBtn = document.createElement("button");
   incorrectBtn.innerText = "❌ False positive";
   incorrectBtn.style.cssText = `
@@ -141,6 +164,7 @@ function addFeedbackUI(postElement) {
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
+    flex: 1;
   `;
   
   correctBtn.addEventListener("click", () => {
@@ -155,8 +179,9 @@ function addFeedbackUI(postElement) {
     postElement.style.setProperty('border', 'none', 'important'); // Remove border for false positive
   });
   
-  feedbackContainer.appendChild(correctBtn);
-  feedbackContainer.appendChild(incorrectBtn);
+  buttonsRow.appendChild(correctBtn);
+  buttonsRow.appendChild(incorrectBtn);
+  feedbackContainer.appendChild(buttonsRow);
   postElement.appendChild(feedbackContainer);
 }
 

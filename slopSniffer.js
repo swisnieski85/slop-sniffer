@@ -6,6 +6,8 @@
 
 const SlopSniffer = (() => {
   // Em dash character
+  const SENTENCE_SPLIT_REGEX = /(?<=[.:!?•…])\s+(?=[A-Z])|\n+/;
+  
   const emDash = '\u2014';
 
   // Other dash-like characters (excluding em dash)
@@ -51,11 +53,11 @@ const SlopSniffer = (() => {
 
   function splitSentences(text) {
     // Basic sentence splitter
-    return text.trim().split(/(?<=[.:!?•…])\s+(?=[A-Z])|\n+/);
+    return text.trim().split(SENTENCE_SPLIT_REGEX);
   }
   
-  // Heuristic 1: Contrast framing with negation + dash
-  function sniffContrastFraming(text) {
+  // Heuristic 1: Contrast Framing w/ Dash
+  function sniffContrastFramingInline(text) {
     if (!dashRegex.test(text)) return { detected: false };
     
     const sentences = splitSentences(text);
@@ -66,15 +68,177 @@ const SlopSniffer = (() => {
     
     return {
       detected: isDetected,
-      reason: isDetected ? "Contrast Framing" : null,
-      heuristic: "contrast_framing"
+      reason: isDetected ? "Contrast Framing (Inline)" : null,
+      heuristic: "contrast_framing_inline"
     };
   }
+  
+  // Heuristic 2: Contast Framing across sentences
+  function sniffContrastFramingSequential(text) {
+      const sentences = text
+        .trim()
+        .split(SENTENCE_SPLIT_REGEX)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const startsWithPhrase = (sentence, phrase) =>
+        new RegExp(`^${phrase}`, 'i').test(sentence);
+
+      for (let i = 0; i < sentences.length - 1; i++) {
+        const first = sentences[i];
+        const second = sentences[i + 1];
+
+        // Pattern 1: "Not because " -> "Because "
+        if (startsWithPhrase(first, 'Not because ') && startsWithPhrase(second, 'Because ')) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
+        
+        // Pattern 1b: "Not because " -> "But because "
+        if (startsWithPhrase(first, 'Not because ') && startsWithPhrase(second, 'But because ')) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
+
+        // Pattern 2: "Sometimes " + contains negation -> "It's"
+        if (
+          startsWithPhrase(first, 'Sometimes ') &&
+          negationRegex.test(first) &&
+          startsWithPhrase(second, "It's")
+        ) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
+
+        // Pattern 3: "This isn't" -> "It's"
+        if (startsWithPhrase(first, "This isn't") && startsWithPhrase(second, "It's")) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
+      }
+
+      return { detected: false };
+    }
+
+  
+  // Heuristic 3: Negative Tricolon
+  function sniffNegativeTricolon(text) {
+      const negationCount = (text.match(/\b(?:No|Not)\b/gi) || []).length;
+      if (negationCount < 2) {
+        return { detected: false };
+      }
+
+      const sentences = text
+        .trim()
+        .split(SENTENCE_SPLIT_REGEX)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      // Helper to check start word or phrase, requiring space after
+      const startsWithWord = (sentence, word) =>
+        new RegExp(`^${word}`, 'i').test(sentence);
+
+      for (let i = 0; i <= sentences.length - 3; i++) {
+        const first = sentences[i];
+        const second = sentences[i + 1];
+        const third = sentences[i + 2];
+
+        // Existing check for three successive sentences beginning with "No" or "Not", or two and then "Just"
+        let negWord = null;
+        if (startsWithWord(first, 'No ') && startsWithWord(second, 'No ')) {
+          negWord = 'No ';
+        } else if (startsWithWord(first, 'Not ') && startsWithWord(second, 'Not ')) {
+          negWord = 'Not ';
+        }
+
+        if (negWord) {
+          if (startsWithWord(third, negWord)) {
+            return {
+              detected: true,
+              reason: "Negative Tricolon",
+              heuristic: "negative_tricolon"
+            };
+          }
+          if (startsWithWord(third, 'Just ')) {
+            return {
+              detected: true,
+              reason: "Negative Tricolon",
+              heuristic: "negative_tricolon"
+            };
+          }
+          continue;
+        }
+
+        // Two sentences starting with "Not for " and the third with "For "
+        if (
+          startsWithWord(first, 'Not for ') &&
+          startsWithWord(second, 'Not for ') &&
+          startsWithWord(third, 'For ')
+        ) {
+          return {
+            detected: true,
+            reason: "Negative Tricolon",
+            heuristic: "negative_tricolon"
+          };
+        }
+      }
+
+      return { detected: false };
+    }
+
+  
+  // Method 3: Interrogative Hook
+  function sniffInterrogativeHook(text) {
+  const sentences = text
+    .trim()
+    .split(SENTENCE_SPLIT_REGEX)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  for (let i = 0; i < sentences.length - 1; i++) {
+    const first = sentences[i];
+    const second = sentences[i + 1];
+
+    // Check: first is a short question
+    if (/\?$/.test(first)) {
+      const wordCount = first.replace(/\?$/, '').trim().split(/\s+/).length;
+      if (wordCount >= 2 && wordCount <= 3) {
+        // Second sentence exists and is not empty
+        if (second.length > 0) {
+          return {
+            detected: true,
+            reason: "Interrogative Hook",
+            heuristic: "interrogative_hook"
+          };
+        }
+      }
+    }
+  }
+
+  return { detected: false };
+}
+
+
 
   // Main detection method - runs all heuristics
   function sniff(text) {
     const heuristics = [
-      sniffContrastFraming
+      sniffContrastFramingInline,
+      sniffContrastFramingSequential,
+      sniffNegativeTricolon,
+      sniffInterrogativeHook
     ];
     
     for (const heuristic of heuristics) {
@@ -89,6 +253,9 @@ const SlopSniffer = (() => {
 
   return { 
     sniff,
-    sniffContrastFraming
+    sniffContrastFramingInline,
+    sniffContrastFramingSequential,
+    sniffNegativeTricolon,
+    sniffInterrogativeHook
   };
 })();

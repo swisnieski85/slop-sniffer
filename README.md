@@ -7,7 +7,7 @@
 ## Status
 
 **Beta Release**  
-This is version `1.1` - a working Chrome extension ready for testing. The detection algorithm uses one primary heuristic, with plans to add up to eight more detection patterns in future releases. Because the extension is still in development, it is not a packed extension available through the Google chrome Web Store. It must be downloaded and then loaded as an unpacked extension (steps on doing this are included below).
+This is version `1.2` - a working Chrome extension ready for testing. The detection algorithm uses four distinct heuristics, with one more heuristic and several other improvements still planned. Because the extension is still in development, it is not a packed extension available through the Google chrome Web Store. It must be downloaded and then loaded as an unpacked extension (steps on doing this are included below).
 
 ## Features
 
@@ -83,23 +83,46 @@ Your feedback helps train the algorithm and reduces false positives for everyone
 
 ## How Detection Works
 
-Currently uses one heuristic that catches a common AI writing pattern:
+Currently uses multiple heuristics that catch common AI writing patterns often seen in LinkedIn posts:
 
-**Pattern**: Posts containing dash-like characters where the pre-dash clause contains negation words (evidence of contrast framing)
+### 1. Contrast Framing (Inline)  
+**Pattern:** Sentences containing dash-like characters where the clause before the dash includes negation words (e.g., "not", "isn't", "don't"), indicating contrast framing.  
+**Examples flagged:**  
+- "It's not just innovative — it's revolutionary"  
+- "This isn't your average solution - it's transformative"  
+- "We don't just deliver results — we exceed expectations"  
 
-**Examples that get flagged**:
-- "It's not just innovative — it's revolutionary"
-- "This isn't your average solution - it's transformative" 
-- "We don't just deliver results — we exceed expectations"
+### 2. Contrast Framing (Sequential)
+**Pattern**: Contrast framing across several successive sentences.
+**Examples flagged:**  
+- A sentence starting with **"Not because "** immediately followed by a sentence starting with **"Because "**.  ("Not because you're weak. Because you're strong.")
+- A sentence starting with **"Sometimes "** that contains a negation word, followed by a sentence starting with **"It's"** (or "It’s").  ("Sometimes it's not about raising your voice. It's about being heard.")
+- A sentence starting with **"This isn't"** immediately followed by a sentence starting with **"It's"**. ("This isn't about efficiency. It's about erosion.")
 
-**Why this works**: AI models often use this contrast-framing structure, while humans tend to write more naturally.
+### 3. Negative Tricolon  
+**Pattern:** Three consecutive sentences beginning with negation words or phrases such as "No", "Not", or the sequence "Not for", "Not for", then "For". Also triggers if two negation-starting sentences are followed by one starting with "Just".  
+**Example flagged:**  
+- "Not HR. Not your manager. Not the economy."
+- "No skill. No talent. Just vibes."
+
+### 4. Interrogative Hook  
+**Pattern:** A short question (2-3 words) ending with a question mark, followed by a substantive sentence. This rhetorical style is common in AI-generated content trying to engage the reader.  
+**Example flagged:**  
+- "Her jaw? Dropped like she just saw Beyonce at the local gym."
+- "And honestly? Sometimes we all need a break."
+
+---
+
+**Why this works:**  
+AI writing models frequently rely on these stylistic devices to structure content and engage readers, often overusing them in ways that stand out compared to typical human writing patterns. This tool detects these signatures to flag likely AI-generated posts.
+
 
 ## Future Plans
 
-- **More Detection Patterns**: 8 additional heuristics planned for implementation
+- **More Detection Patterns**: One additional heuristic planned (based on emoji distributions)
 - **Improved Accuracy**: Refinement of heuristics based on feedback
-- **Better Analytics**: Detection statistics and trends
-- **Other Browser Implementations**: Maybe, eventually, expanding the extension to work for other browsers or even devices
+- **Better Targeting**: Prevent masking certain kinds of posts (e.g., job postings) which are of interest to users even if they are AI-generated
+- **Other Browser/Device Implementations**: Maybe, eventually, expanding the extension to work for other browsers or even devices
 
 ## Contributing
 
