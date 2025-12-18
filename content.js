@@ -19,6 +19,32 @@ function findLinkedInPosts() {
   return document.querySelectorAll("div.feed-shared-update-v2");
 }
 
+function findLinkedInComments() {
+  return document.querySelectorAll("article.comments-comment-entity");
+}
+
+function isJobPosting(postElement) {
+  // Check 1: Look for job-specific URL (most reliable and fastest)
+  if (postElement.querySelector('a[href*="linkedin.com/jobs/view"]')) {
+    return true;
+  }
+
+  // Check 2: Look for job entity card container
+  if (postElement.querySelector('.update-components-entity.feed-shared-update-v2__content')) {
+    return true;
+  }
+
+  // Check 3: Look for "View job" button text
+  const buttons = postElement.querySelectorAll('.update-components-button__text');
+  for (let button of buttons) {
+    if (button.textContent.trim() === 'View job') {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function overlayPost(postElement, reason) {
   const overlay = document.createElement("div");
   overlay.className = "slop-sniffer-overlay";
@@ -95,6 +121,64 @@ function overlayPost(postElement, reason) {
   // Always use the main post element, not a sub-container
   postElement.style.position = "relative";
   postElement.appendChild(overlay);
+}
+
+function overlayComment(commentElement, reason) {
+  const overlay = document.createElement("div");
+  overlay.className = "slop-sniffer-comment-overlay";
+
+  const text = document.createElement("p");
+  text.innerText = "Woof! AI-Generated Comment Detected!";
+  text.style.fontWeight = "bold";
+  text.style.fontSize = "13px";
+  text.style.color = "#DAA520";
+  text.style.marginBottom = "8px";
+
+  const button = document.createElement("button");
+  button.innerText = "Show me the slop, anyway!";
+  button.style.cursor = "pointer";
+  button.style.border = "1px solid #ccc";
+  button.style.padding = "4px 8px";
+  button.style.background = "#f9f9f9";
+  button.style.fontSize = "11px";
+
+  button.addEventListener("click", () => {
+    overlay.style.transition = "opacity 0.3s ease";
+    overlay.style.opacity = 0;
+
+    setTimeout(() => {
+      overlay.remove();
+      // Add gold border box around revealed comment
+      commentElement.style.setProperty('border', '2px solid gold', 'important');
+      commentElement.style.setProperty('border-radius', '4px', 'important');
+      commentElement.style.setProperty('padding', '8px', 'important');
+    }, 300);
+  });
+
+  overlay.appendChild(text);
+  overlay.appendChild(button);
+
+  // Style the overlay - more compact for comments
+  Object.assign(overlay.style, {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    border: "2px solid gold",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "8px",
+    zIndex: 50,
+    fontSize: "12px",
+  });
+
+  // Apply overlay to entire comment article (covers profile pic, name, and content)
+  commentElement.style.position = "relative";
+  commentElement.appendChild(overlay);
 }
 
 function addFeedbackUI(postElement, reason) {
@@ -254,19 +338,58 @@ function sendFeedback(postElement, isCorrect) {
   });
 }
 
+function processComments() {
+  const comments = findLinkedInComments();
+
+  comments.forEach((comment) => {
+    // Skip if we've already processed this comment
+    if (comment.hasAttribute('data-slop-processed')) {
+      return;
+    }
+
+    // Mark as processed immediately to avoid re-processing
+    comment.setAttribute('data-slop-processed', 'true');
+
+    // Extract comment text from the content area
+    const contentSection = comment.querySelector('.comments-comment-item__main-content');
+    if (!contentSection) {
+      return;
+    }
+
+    const text = contentSection.innerText;
+    const result = SlopSniffer.sniff(text);
+    if (result.detected) {
+      overlayComment(comment, result.reason);
+    }
+  });
+}
+
 function processPosts() {
   const posts = findLinkedInPosts();
-  
+
   posts.forEach((post) => {
     // Skip if we've already processed this post
     if (post.hasAttribute('data-slop-processed')) {
       return;
     }
-    
+
     // Mark as processed immediately to avoid re-processing
     post.setAttribute('data-slop-processed', 'true');
-    
-    const text = post.innerText;
+
+    // Skip job postings - users want to see these even if AI-generated
+    if (isJobPosting(post)) {
+      return;
+    }
+
+    // Get post text but exclude comment text to avoid false positives
+    // Clone the post, remove comments section, then get text
+    const postClone = post.cloneNode(true);
+    const commentsSection = postClone.querySelector('.comments-comments-list');
+    if (commentsSection) {
+      commentsSection.remove();
+    }
+    const text = postClone.innerText;
+
     const result = SlopSniffer.sniff(text);
     if (result.detected) {
       overlayPost(post, result.reason);
@@ -274,14 +397,19 @@ function processPosts() {
   });
 }
 
-// Debounced version that only runs once every 100ms max
-const debouncedProcessPosts = debounce(processPosts, 100);
+function processAll() {
+  processPosts();
+  processComments();
+}
 
-// More targeted observer - only watch for new posts being added
+// Debounced version that only runs once every 100ms max
+const debouncedProcessAll = debounce(processAll, 100);
+
+// More targeted observer - watch for new posts and comments being added
 const observer = new MutationObserver((mutations) => {
-  // Only process if we actually see new LinkedIn posts being added
+  // Only process if we actually see new LinkedIn posts or comments being added
   let shouldProcess = false;
-  
+
   for (const mutation of mutations) {
     if (mutation.type === 'childList') {
       for (const node of mutation.addedNodes) {
@@ -295,14 +423,23 @@ const observer = new MutationObserver((mutations) => {
             shouldProcess = true;
             break;
           }
+          // Check if this is a LinkedIn comment or contains LinkedIn comments
+          if (node.matches && node.matches('article.comments-comment-entity')) {
+            shouldProcess = true;
+            break;
+          }
+          if (node.querySelector && node.querySelector('article.comments-comment-entity')) {
+            shouldProcess = true;
+            break;
+          }
         }
       }
       if (shouldProcess) break;
     }
   }
-  
+
   if (shouldProcess) {
-    debouncedProcessPosts();
+    debouncedProcessAll();
   }
 });
 
@@ -317,7 +454,7 @@ observer.observe(feedContainer, {
 // Initial processing when page loads
 window.addEventListener("load", () => {
   // Small delay to let LinkedIn finish loading
-  setTimeout(processPosts, 1000);
+  setTimeout(processAll, 1000);
 });
 
 // Also process when navigating within LinkedIn (SPA behavior)
@@ -330,6 +467,6 @@ new MutationObserver(() => {
     document.querySelectorAll('[data-slop-processed]').forEach(el => {
       el.removeAttribute('data-slop-processed');
     });
-    setTimeout(processPosts, 1000);
+    setTimeout(processAll, 1000);
   }
 }).observe(document, { subtree: true, childList: true });

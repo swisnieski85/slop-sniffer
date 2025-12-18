@@ -4,6 +4,18 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2025-12-18
+### Added
+- Job posting exemption: Posts containing LinkedIn job advertisements are now exempt from AI content blocking, even if they contain AI-generated text. Users want to see job opportunities regardless of how they were written.
+- Contrast Framing (Sequential) enhancement: Added pattern #4 to detect any sentence containing a negation word followed by "It's", catching patterns like "The hard part isn't X. It's Y."
+- Comment detection: Extension now analyzes and flags AI-generated comments in addition to posts. Comments receive a compact overlay that covers the entire comment (including profile picture and commenter details).
+
+### Fixed
+- Contrast Framing (Sequential) apostrophe handling: The `startsWithPhrase` helper now correctly matches both straight (') and curly (') apostrophes.
+
+### Removed
+- Interrogative Hook heuristic removed due to excessive false positives.
+
 ## [1.2.0] - 2025-08-13
 ### Added
 - Three new detection heuristics added: Contrast Framing (Sequential), Negative Tricolon, and Interrogative Hook

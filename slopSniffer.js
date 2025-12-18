@@ -81,8 +81,12 @@ const SlopSniffer = (() => {
         .map(s => s.trim())
         .filter(Boolean);
 
-      const startsWithPhrase = (sentence, phrase) =>
-        new RegExp(`^${phrase}`, 'i').test(sentence);
+      // Helper that handles both straight and curly apostrophes
+      const startsWithPhrase = (sentence, phrase) => {
+        // Replace apostrophes in the phrase with a regex that matches both types
+        const escapedPhrase = phrase.replace(/'/g, "['\u2019]");
+        return new RegExp(`^${escapedPhrase}`, 'i').test(sentence);
+      };
 
       for (let i = 0; i < sentences.length - 1; i++) {
         const first = sentences[i];
@@ -121,6 +125,16 @@ const SlopSniffer = (() => {
 
         // Pattern 3: "This isn't" -> "It's"
         if (startsWithPhrase(first, "This isn't") && startsWithPhrase(second, "It's")) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
+
+        // Pattern 4: Any sentence with negation -> "It's"
+        // Catches: "The hard part isn't X. It's Y."
+        if (negationRegex.test(first) && startsWithPhrase(second, "It's")) {
           return {
             detected: true,
             reason: "Contrast Framing (Sequential)",
@@ -198,38 +212,6 @@ const SlopSniffer = (() => {
       return { detected: false };
     }
 
-  
-  // Method 3: Interrogative Hook
-  function sniffInterrogativeHook(text) {
-  const sentences = text
-    .trim()
-    .split(SENTENCE_SPLIT_REGEX)
-    .map(s => s.trim())
-    .filter(Boolean);
-
-  for (let i = 0; i < sentences.length - 1; i++) {
-    const first = sentences[i];
-    const second = sentences[i + 1];
-
-    // Check: first is a short question
-    if (/\?$/.test(first)) {
-      const wordCount = first.replace(/\?$/, '').trim().split(/\s+/).length;
-      if (wordCount >= 2 && wordCount <= 3) {
-        // Second sentence exists and is not empty
-        if (second.length > 0) {
-          return {
-            detected: true,
-            reason: "Interrogative Hook",
-            heuristic: "interrogative_hook"
-          };
-        }
-      }
-    }
-  }
-
-  return { detected: false };
-}
-
 
 
   // Main detection method - runs all heuristics
@@ -237,8 +219,7 @@ const SlopSniffer = (() => {
     const heuristics = [
       sniffContrastFramingInline,
       sniffContrastFramingSequential,
-      sniffNegativeTricolon,
-      sniffInterrogativeHook
+      sniffNegativeTricolon
     ];
     
     for (const heuristic of heuristics) {
@@ -255,7 +236,6 @@ const SlopSniffer = (() => {
     sniff,
     sniffContrastFramingInline,
     sniffContrastFramingSequential,
-    sniffNegativeTricolon,
-    sniffInterrogativeHook
+    sniffNegativeTricolon
   };
 })();

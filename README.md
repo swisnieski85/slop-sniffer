@@ -6,15 +6,17 @@
 
 ## Status
 
-**Beta Release**  
-This is version `1.2` - a working Chrome extension ready for testing. The detection algorithm uses four distinct heuristics, with one more heuristic and several other improvements still planned. Because the extension is still in development, it is not a packed extension available through the Google chrome Web Store. It must be downloaded and then loaded as an unpacked extension (steps on doing this are included below).
+**Beta Release**
+This is version `1.3` - a working Chrome extension ready for testing. The detection algorithm uses three distinct heuristics, with one more heuristic and several other improvements still planned. Because the extension is still in development, it is not a packed extension available through the Google chrome Web Store. It must be downloaded and then loaded as an unpacked extension (steps on doing this are included below).
 
 ## Features
 
-- **Regex-Based Detection**: Quickly identifies posts containing classic signs of AI authorship (e.g., a contrast-framed sentence containing an em-dash: "it's not just stunning—it's brave")
-- **Clean Interface**: Covers suspected AI posts with a gold-bordered overlay indicating the reason the content was identified as AI-generated
-- **User Control**: "Show me the slop, anyway!" button to reveal content when desired
-- **Feedback System**: Optional feedback buttons to help improve detection accuracy when
+- **Regex-Based Detection**: Quickly identifies posts and comments containing classic signs of AI authorship (e.g., a contrast-framed sentence containing an em-dash: "it's not just stunning—it's brave")
+- **Comment Detection**: Analyzes LinkedIn comments in addition to posts, with compact overlays for flagged comments
+- **Job Posting Exemption**: Automatically excludes LinkedIn job advertisements from detection, ensuring you never miss career opportunities
+- **Clean Interface**: Covers suspected AI content with gold-bordered overlays indicating the reason the content was identified as AI-generated
+- **User Control**: "Show me the slop, anyway!" button (or "Show anyway" for comments) to reveal content when desired
+- **Feedback System**: Optional feedback buttons to help improve detection accuracy
 - **Performance Optimized**: Debounced processing that won't slow down LinkedIn
 
 ## Installation
@@ -83,45 +85,42 @@ Your feedback helps train the algorithm and reduces false positives for everyone
 
 ## How Detection Works
 
-Currently uses multiple heuristics that catch common AI writing patterns often seen in LinkedIn posts:
+Currently uses three heuristics that catch common AI writing patterns often seen in LinkedIn posts:
 
-### 1. Contrast Framing (Inline)  
-**Pattern:** Sentences containing dash-like characters where the clause before the dash includes negation words (e.g., "not", "isn't", "don't"), indicating contrast framing.  
-**Examples flagged:**  
-- "It's not just innovative — it's revolutionary"  
-- "This isn't your average solution - it's transformative"  
-- "We don't just deliver results — we exceed expectations"  
+### 1. Contrast Framing (Inline)
+**Pattern:** Sentences containing dash-like characters where the clause before the dash includes negation words (e.g., "not", "isn't", "don't"), indicating contrast framing.
+**Examples flagged:**
+- "It's not just innovative — it's revolutionary"
+- "This isn't your average solution - it's transformative"
+- "We don't just deliver results — we exceed expectations"
 
 ### 2. Contrast Framing (Sequential)
 **Pattern**: Contrast framing across several successive sentences.
-**Examples flagged:**  
+**Examples flagged:**
 - A sentence starting with **"Not because "** immediately followed by a sentence starting with **"Because "**.  ("Not because you're weak. Because you're strong.")
-- A sentence starting with **"Sometimes "** that contains a negation word, followed by a sentence starting with **"It's"** (or "It’s").  ("Sometimes it's not about raising your voice. It's about being heard.")
+- A sentence starting with **"Sometimes "** that contains a negation word, followed by a sentence starting with **"It's"** (or "It's").  ("Sometimes it's not about raising your voice. It's about being heard.")
 - A sentence starting with **"This isn't"** immediately followed by a sentence starting with **"It's"**. ("This isn't about efficiency. It's about erosion.")
+- Any sentence containing a negation word, followed by a sentence starting with **"It's"**. ("The difficulty isn't X. It's Y.")
 
-### 3. Negative Tricolon  
-**Pattern:** Three consecutive sentences beginning with negation words or phrases such as "No", "Not", or the sequence "Not for", "Not for", then "For". Also triggers if two negation-starting sentences are followed by one starting with "Just".  
-**Example flagged:**  
+### 3. Negative Tricolon
+**Pattern:** Three consecutive sentences beginning with negation words or phrases such as "No", "Not", or the sequence "Not for", "Not for", then "For". Also triggers if two negation-starting sentences are followed by one starting with "Just".
+**Example flagged:**
 - "Not HR. Not your manager. Not the economy."
 - "No skill. No talent. Just vibes."
 
-### 4. Interrogative Hook  
-**Pattern:** A short question (2-3 words) ending with a question mark, followed by a substantive sentence. This rhetorical style is common in AI-generated content trying to engage the reader.  
-**Example flagged:**  
-- "Her jaw? Dropped like she just saw Beyonce at the local gym."
-- "And honestly? Sometimes we all need a break."
-
 ---
 
-**Why this works:**  
+**Why this works:**
 AI writing models frequently rely on these stylistic devices to structure content and engage readers, often overusing them in ways that stand out compared to typical human writing patterns. This tool detects these signatures to flag likely AI-generated posts.
+
+**Job Posting Exemption:**
+Posts containing LinkedIn job advertisements (identified by job card UI elements, job URLs, or "View job" buttons) are automatically excluded from detection to ensure users never miss career opportunities.
 
 
 ## Future Plans
 
 - **More Detection Patterns**: One additional heuristic planned (based on emoji distributions)
 - **Improved Accuracy**: Refinement of heuristics based on feedback
-- **Better Targeting**: Prevent masking certain kinds of posts (e.g., job postings) which are of interest to users even if they are AI-generated
 - **Other Browser/Device Implementations**: Maybe, eventually, expanding the extension to work for other browsers or even devices
 
 ## Contributing
