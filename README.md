@@ -101,6 +101,7 @@ Currently uses three heuristics that catch common AI writing patterns often seen
 - A sentence starting with **"Sometimes "** that contains a negation word, followed by a sentence starting with **"It's"** (or "It's").  ("Sometimes it's not about raising your voice. It's about being heard.")
 - A sentence starting with **"This isn't"** immediately followed by a sentence starting with **"It's"**. ("This isn't about efficiency. It's about erosion.")
 - Any sentence containing a negation word, followed by a sentence starting with **"It's"**. ("The difficulty isn't X. It's Y.")
+- Any sentence containing a negation word, followed by a sentence starting with **"It was"**. ("The code wasn't AI-generated. It was collaboratively discovered.")
 
 ### 3. Negative Tricolon
 **Pattern:** Three consecutive sentences beginning with negation words or phrases such as "No", "Not", or the sequence "Not for", "Not for", then "For". Also triggers if two negation-starting sentences are followed by one starting with "Just".

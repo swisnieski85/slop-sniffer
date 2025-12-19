@@ -5,8 +5,8 @@
  */
 
 const SlopSniffer = (() => {
-  // Em dash character
-  const SENTENCE_SPLIT_REGEX = /(?<=[.:!?•…])\s+(?=[A-Z])|\n+/;
+  // Split on sentence-ending punctuation + optional whitespace + capital letter, or newlines
+  const SENTENCE_SPLIT_REGEX = /(?<=[.:!?•…])\s*(?=[A-Z"'])|\n+/;
   
   const emDash = '\u2014';
 
@@ -79,6 +79,7 @@ const SlopSniffer = (() => {
         .trim()
         .split(SENTENCE_SPLIT_REGEX)
         .map(s => s.trim())
+        .map(s => s.replace(/["\u201C\u201D]/g, '')) // Strip only double quotes (straight and curly), keep apostrophes
         .filter(Boolean);
 
       // Helper that handles both straight and curly apostrophes
@@ -135,6 +136,16 @@ const SlopSniffer = (() => {
         // Pattern 4: Any sentence with negation -> "It's"
         // Catches: "The hard part isn't X. It's Y."
         if (negationRegex.test(first) && startsWithPhrase(second, "It's")) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
+
+        // Pattern 5: Any sentence with negation -> "It was"
+        // Catches: "The code wasn't X. It was Y."
+        if (negationRegex.test(first) && startsWithPhrase(second, "It was")) {
           return {
             detected: true,
             reason: "Contrast Framing (Sequential)",

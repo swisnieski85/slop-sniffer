@@ -4,6 +4,14 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.1] - 2025-12-19
+### Added
+- Contrast Framing (Sequential) enhancement: Added pattern #5 to detect past-tense variant "X wasn't Y. It was Z.", catching patterns like "The thing wasn't A. It was B."
+
+### Fixed
+- Sentence splitting now handles periods without trailing spaces (e.g., `sentence.Next` now splits correctly).
+- Quote stripping now preserves apostrophes in contractions while removing quotation marks, fixing negation detection in quoted text.
+
 ## [1.3.0] - 2025-12-18
 ### Added
 - Job posting exemption: Posts containing LinkedIn job advertisements are now exempt from AI content blocking, even if they contain AI-generated text. Users want to see job opportunities regardless of how they were written.
