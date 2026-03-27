@@ -21,7 +21,7 @@ const SlopSniffer = (() => {
     '\u2212'  // minus sign
   ];
 
-  const dashRegex = new RegExp(`(\\s[${otherDashes.join('')}](?=\\s)|${emDash})`);
+  const dashRegex = new RegExp(`(\\s[${otherDashes.join('')}](?=\\s)|${emDash}|\\s--(?=\\s))`);
 
   // Apostrophe can be straight or curly
   const apostrophe = "['\u2019]";
@@ -146,6 +146,16 @@ const SlopSniffer = (() => {
         // Pattern 5: Any sentence with negation -> "It was"
         // Catches: "The code wasn't X. It was Y."
         if (negationRegex.test(first) && startsWithPhrase(second, "It was")) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
+
+        // Pattern 6: "I'm not " -> "I'm "
+        // Catches: "I'm not looking to perform. I'm looking for alignment."
+        if (startsWithPhrase(first, "I'm not ") && startsWithPhrase(second, "I'm ")) {
           return {
             detected: true,
             reason: "Contrast Framing (Sequential)",

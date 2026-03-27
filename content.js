@@ -16,26 +16,29 @@ function debounce(func, wait) {
 }
 
 function findLinkedInPosts() {
-  return document.querySelectorAll("div.feed-shared-update-v2");
+  // New SDUI/React feed
+  const newPosts = document.querySelectorAll('[data-testid="mainFeed"] [role="listitem"]');
+  if (newPosts.length > 0) return newPosts;
+  // Legacy Ember direct post page
+  return document.querySelectorAll('div.feed-shared-update-v2');
 }
 
 function findLinkedInComments() {
-  return document.querySelectorAll("article.comments-comment-entity");
+  // New SDUI/React feed
+  const newComments = document.querySelectorAll('[componentkey^="replaceableComment_"][viewtrackingspecs]');
+  if (newComments.length > 0) return newComments;
+  // Legacy Ember direct post page
+  return document.querySelectorAll('article.comments-comment-entity');
 }
 
 function isJobPosting(postElement) {
-  // Check 1: Look for job-specific URL (most reliable and fastest)
+  // Check 1: Look for job-specific URL (most reliable)
   if (postElement.querySelector('a[href*="linkedin.com/jobs/view"]')) {
     return true;
   }
 
-  // Check 2: Look for job entity card container
-  if (postElement.querySelector('.update-components-entity.feed-shared-update-v2__content')) {
-    return true;
-  }
-
-  // Check 3: Look for "View job" button text
-  const buttons = postElement.querySelectorAll('.update-components-button__text');
+  // Check 2: Look for "View job" button text (class-agnostic)
+  const buttons = postElement.querySelectorAll('button, [role="button"]');
   for (let button of buttons) {
     if (button.textContent.trim() === 'View job') {
       return true;
@@ -298,11 +301,17 @@ function sendFeedback(postElement, isCorrect) {
     }
   }
 
+  // Method 4: Extract URN from SDUI componentkey attribute
+  if (!postId) {
+    const componentKey = postElement.getAttribute('componentkey');
+    if (componentKey) {
+      const match = componentKey.match(/urn:li:(activity|ugcPost):\d+/);
+      if (match) postId = match[0];
+    }
+  }
+
   // Fallback
   if (!postId) {
-    const postText = postElement.innerText.trim();
-    const firstLine = postText.split('\n')[0].substring(0, 50);
-    const timestamp = Date.now();
     postId = `urn-unknown`;
   }
 
@@ -351,7 +360,8 @@ function processComments() {
     comment.setAttribute('data-slop-processed', 'true');
 
     // Extract comment text from the content area
-    const contentSection = comment.querySelector('.comments-comment-item__main-content');
+    const contentSection = comment.querySelector('[data-testid="expandable-text-box"]')
+      || comment.querySelector('.comments-comment-item__main-content');
     if (!contentSection) {
       return;
     }
@@ -415,15 +425,24 @@ const observer = new MutationObserver((mutations) => {
       for (const node of mutation.addedNodes) {
         if (node.nodeType === Node.ELEMENT_NODE) {
           // Check if this is a LinkedIn post or contains LinkedIn posts
-          if (node.matches && node.matches('div.feed-shared-update-v2')) {
+          if (node.matches && node.matches('[role="listitem"]')) {
             shouldProcess = true;
             break;
           }
-          if (node.querySelector && node.querySelector('div.feed-shared-update-v2')) {
+          if (node.querySelector && node.querySelector('[role="listitem"]')) {
             shouldProcess = true;
             break;
           }
-          // Check if this is a LinkedIn comment or contains LinkedIn comments
+          // Check if this is a LinkedIn comment or contains LinkedIn comments (SDUI feed)
+          if (node.matches && node.matches('[componentkey^="replaceableComment_"][viewtrackingspecs]')) {
+            shouldProcess = true;
+            break;
+          }
+          if (node.querySelector && node.querySelector('[componentkey^="replaceableComment_"][viewtrackingspecs]')) {
+            shouldProcess = true;
+            break;
+          }
+          // Check if this is a LinkedIn comment or contains LinkedIn comments (legacy Ember)
           if (node.matches && node.matches('article.comments-comment-entity')) {
             shouldProcess = true;
             break;
@@ -444,7 +463,7 @@ const observer = new MutationObserver((mutations) => {
 });
 
 // More specific observation target - LinkedIn's main feed container
-const feedContainer = document.querySelector('main.scaffold-layout__main') || document.body;
+const feedContainer = document.querySelector('[role="main"]') || document.querySelector('main') || document.querySelector('#workspace') || document.body;
 
 observer.observe(feedContainer, {
   childList: true,
