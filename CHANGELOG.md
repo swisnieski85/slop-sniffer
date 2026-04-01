@@ -4,12 +4,22 @@ All notable changes to the SlopSniffer project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-03-28
+### Added
+- Contrast Framing (Sequential) Pattern 7: detects `"You're not [X]. You're [Y]."` constructions. (I should've incremented the major version before, darn it.)
+
+
 ## [1.3.2] - 2026-03-27
+### Added
+- Contrast Framing (Sequential) Pattern 6: detects `"I'm not [X]. I'm [Y]."` constructions.
+- Contrast Framing (Inline) now also matches double-hyphen (`--`) surrounded by spaces, in addition to em dashes and single dashes.
+
 ### Fixed
 - Updated post and comment selectors to support LinkedIn's new SDUI/React feed renderer, which replaced semantic class names with obfuscated hashes. Posts now use `[data-testid="mainFeed"] [role="listitem"]` and comments use `[componentkey^="replaceableComment_"][viewtrackingspecs]`.
 - Restored compatibility with LinkedIn's legacy Ember renderer (used on direct post pages), which still uses the original class-based selectors. Both renderers are now detected and handled.
 - Job postings should now be excluded from SlopSniffer detection (no one cares if a job posting text is partially AI-generated, right?).
 - Cleaned up code and removed dead variables.
+
 
 ## [1.3.1] - 2025-12-19
 ### Added

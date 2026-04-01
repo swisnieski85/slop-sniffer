@@ -162,6 +162,16 @@ const SlopSniffer = (() => {
             heuristic: "contrast_framing_sequential"
           };
         }
+
+        // Pattern 7: "You're not " -> "You're "
+        // Catches: "You're not terrible. You're just under-resourced."
+        if (startsWithPhrase(first, "You're not ") && startsWithPhrase(second, "You're ")) {
+          return {
+            detected: true,
+            reason: "Contrast Framing (Sequential)",
+            heuristic: "contrast_framing_sequential"
+          };
+        }
       }
 
       return { detected: false };
